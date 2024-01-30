@@ -1,9 +1,9 @@
 import React from "react";
-import MySelect from "./UI/select/MySelect";
+import { MySelect } from "./UI/select/MySelect";
 import MyInput from "./UI/input/MyInput";
-import sortPosts from "../App";
+// import sortPosts from "../App";
 
-const PostFilter = (filter, setFilter) => {
+const PostFilter = ({filter, setFilter}) => {
     return (
         <div>
         <MyInput type="text"

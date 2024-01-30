@@ -7,8 +7,10 @@ import PostList from './components/PostList';
 import MyButton from './components/UI/buttons/MyButtons';
 import MyInput from './components/UI/input/MyInput';
 import PostForm from './components/PostForm';
-import MySelect from './components/UI/select/MySelect';
-import PostFilter from './components/PostList';
+import { MySelect } from './components/UI/select/MySelect';
+import PostFilter from './components/PostFilter';
+
+//rafc
 
 
 function App() {
@@ -64,13 +66,6 @@ function App() {
             Посты не найдены!
           </h1>
       }
-      {posts.map((post, index) => 
-        <PostItem 
-        remove={removePost} 
-        number={index + 1} 
-        post={post}
-        key={post.id}/>
-      )}
     </div>
   );
 };

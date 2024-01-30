@@ -37,7 +37,15 @@ const PostForm = ({create}) => {
         /> */}
         <MyButton onClick={addNewPost}>Создать пост</MyButton>
       </div>
+      
     )
+    
+  function Alert() {
+    if (post.title === '' || post.body === '') {
+      return alert('Пост был создан');
+    } else {
+      alert('Пост был создан');
+    };
+  }
 }
-
 export default PostForm
