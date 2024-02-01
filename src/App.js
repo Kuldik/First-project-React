@@ -11,7 +11,7 @@ import { MySelect } from './components/UI/select/MySelect';
 import PostFilter from './components/PostFilter';
 import { MyModal } from './components/UI/MyModal/MyModal';
 import { usePosts } from './hooks/usePosts';
-// import axios from 'axios';
+import axios from 'axios';
 
 //rafc
 
@@ -27,10 +27,10 @@ function App() {
   const [modal, setModal] = useState(false);
   const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
 
-  // async function fetchPosts() {
-  //   const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=5')
-  //   console.log(response.data);
-  // }
+  async function fetchPosts() {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=5')
+    setPosts(response.data)
+  }
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
@@ -39,13 +39,16 @@ function App() {
 
   const removePost = (post) => {
     setPosts(posts.filter(p => p.id !== post.id))
-  }
+}
 
   // Метод localeCompare возвращает чилсо, указывающее, должна ли данная строка находиться до,
   // после или в том же самом месте, что и строка, переданная через параметр, при сортировке этих строк
 
   return (
     <div className="App">
+      <button onClick={fetchPosts}>
+        GET POSTS
+      </button>
      
       <MyButton style={{marginTop: 30}} onClick={() => setModal(true)}> {/* нажатие на кнопку вызовет модальное окно */}
         Создать пользователя
