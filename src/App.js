@@ -9,6 +9,9 @@ import MyInput from './components/UI/input/MyInput';
 import PostForm from './components/PostForm';
 import { MySelect } from './components/UI/select/MySelect';
 import PostFilter from './components/PostFilter';
+import { MyModal } from './components/UI/MyModal/MyModal';
+import { usePosts } from './hooks/usePosts';
+// import axios from 'axios';
 
 //rafc
 
@@ -21,22 +24,17 @@ function App() {
   ]);
 
   const [filter, setFilter] = useState({sort: '', query: ''});
+  const [modal, setModal] = useState(false);
+  const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
 
-
-  const sortedPosts = useMemo(() => {
-    console.log("123123");
-    if (filter.sort) {
-      return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))
-    }
-    return posts
-  }, [filter.sort, posts]);
-
-  const sortedAndSearchedPosts = useMemo(() => {
-    return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()))
-  }, [filter.query, sortedPosts]);
+  // async function fetchPosts() {
+  //   const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=5')
+  //   console.log(response.data);
+  // }
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
+    setModal(false) // Необходимо для того чтобы модальное окно закрыввалось после создания поста
   }
 
   const removePost = (post) => {
@@ -48,24 +46,24 @@ function App() {
 
   return (
     <div className="App">
+     
+      <MyButton style={{marginTop: 30}} onClick={() => setModal(true)}> {/* нажатие на кнопку вызовет модальное окно */}
+        Создать пользователя
+      </MyButton>
+      {/* Создаем модальное окно, которое при нажатии на пустое простарнство будет иметь свойсво видимости false */}
+      <MyModal visible={modal} setVisible={setModal}>  
+        <PostForm create={createPost}/>
+      </MyModal>
 
-      <PostForm create={createPost}/>
       <hr style={{margin: '15px 0'}} />
 
       {/* Сортирвка постов */}
       
       <PostFilter 
       filter={filter} 
-      setFilter={setFilter}/>
-      
-      {/* Условная отрисовка */}
-      {/* Использовать тернарный оператор*/}
-      {sortedAndSearchedPosts.length
-        ? <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про JavaScript" />
-        : <h1 style={{textAlign: 'center'}}>
-            Посты не найдены!
-          </h1>
-      }
+      setFilter={setFilter}
+      />
+      <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про JavaScript" />
     </div>
   );
 };
