@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Counter from "./components/Counter";
 import ClassCounter from './components/ClassCounter';
 import './styles/app.css';
@@ -12,25 +12,35 @@ import PostFilter from './components/PostFilter';
 import { MyModal } from './components/UI/MyModal/MyModal';
 import { usePosts } from './hooks/usePosts';
 import axios from 'axios';
+import PostService from './API/PostService';
+import Loader from './components/UI/Loader/Loader';
 
 //rafc
 
 
 function App() {
-  const [posts, setPosts] = useState([
-    {id: 1, title: 'JavaScript', body: 'Description'},
-    {id: 2, title: 'JavaScript 2', body: 'Description'},
-    {id: 3, title: 'JavaScript 3', body: 'Description'},
-  ]);
+  const [posts, setPosts] = useState([]);
 
   const [filter, setFilter] = useState({sort: '', query: ''});
   const [modal, setModal] = useState(false);
   const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
+  const [isPostLoading, setIsPostLoading] = useState(false);
 
   async function fetchPosts() {
-    const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=5')
-    setPosts(response.data)
+    setIsPostLoading(true);
+    setTimeout(async () => {
+      const posts = await PostService.getAll();
+      setPosts(posts);
+      setIsPostLoading(false);
+    }, 1000)
+    // const posts = await PostService.getAll();
+    // setPosts(posts)
+    // setIsPostLoading(false);
   }
+
+  useEffect(() => {
+    fetchPosts()
+  }, [])
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
@@ -46,9 +56,9 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={fetchPosts}>
-        GET POSTS
-      </button>
+      <MyButton style={{marginRight: 30}} onClick={fetchPosts}>
+        Получить посты
+      </MyButton>
      
       <MyButton style={{marginTop: 30}} onClick={() => setModal(true)}> {/* нажатие на кнопку вызовет модальное окно */}
         Создать пользователя
@@ -66,7 +76,11 @@ function App() {
       filter={filter} 
       setFilter={setFilter}
       />
-      <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про JavaScript" />
+      {isPostLoading
+        ? <div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}><Loader/></div>
+        : <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про JavaScript" />
+
+      }
     </div>
   );
 };
