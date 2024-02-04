@@ -14,6 +14,9 @@ import { usePosts } from './hooks/usePosts';
 import axios from 'axios';
 import PostService from './API/PostService';
 import Loader from './components/UI/Loader/Loader';
+import { useFetching } from './hooks/useFetching';
+import { getPageCount } from './utils/pages';
+import { getPagesArray } from './utils/pages';
 
 //rafc
 
@@ -24,19 +27,18 @@ function App() {
   const [filter, setFilter] = useState({sort: '', query: ''});
   const [modal, setModal] = useState(false);
   const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
-  const [isPostLoading, setIsPostLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
+  let pagesArray = getPagesArray(totalPages)
+  
 
-  async function fetchPosts() {
-    setIsPostLoading(true);
-    setTimeout(async () => {
-      const posts = await PostService.getAll();
-      setPosts(posts);
-      setIsPostLoading(false);
-    }, 1000)
-    // const posts = await PostService.getAll();
-    // setPosts(posts)
-    // setIsPostLoading(false);
-  }
+  const [fetchPosts, isPostLoading, postError] = useFetching(async () => {
+    const response = await PostService.getAll(limit, page);
+    setPosts(response.data);
+    const totalCount = response.headers['x-total-count']
+    setTotalPages(getPageCount(totalCount, limit))
+  })
 
   useEffect(() => {
     fetchPosts()
@@ -54,7 +56,7 @@ function App() {
   // Метод localeCompare возвращает чилсо, указывающее, должна ли данная строка находиться до,
   // после или в том же самом месте, что и строка, переданная через параметр, при сортировке этих строк
 
-  return (
+  return ( 
     <div className="App">
       <MyButton style={{marginRight: 30}} onClick={fetchPosts}>
         Получить посты
@@ -76,11 +78,19 @@ function App() {
       filter={filter} 
       setFilter={setFilter}
       />
+      {postError &&
+        <h1>Произошла ошибка ${postError}</h1> // обрабатываем ошибку
+      }
       {isPostLoading
         ? <div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}><Loader/></div>
         : <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про JavaScript" />
 
       }
+      <div className='page__wrapper'>
+        {pagesArray.map(p => 
+          <span className={page === p ? 'page page__current' : 'page'} onClick={() => setPage(p)}>{p}</span> // условие: если элемент итерации функции map = номеру текущей страницы, то добавляем к нему класс page__current если не равны, то page
+        )}
+        </div>
     </div>
   );
 };
