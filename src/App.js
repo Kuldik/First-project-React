@@ -17,6 +17,7 @@ import Loader from './components/UI/Loader/Loader';
 import { useFetching } from './hooks/useFetching';
 import { getPageCount } from './utils/pages';
 import { getPagesArray } from './utils/pages';
+import Pagination from './components/UI/pagination/Pagination';
 
 //rafc
 
@@ -30,7 +31,7 @@ function App() {
   const [totalPages, setTotalPages] = useState(0);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
-  let pagesArray = getPagesArray(totalPages)
+  
   
 
   const [fetchPosts, isPostLoading, postError] = useFetching(async () => {
@@ -42,7 +43,7 @@ function App() {
 
   useEffect(() => {
     fetchPosts()
-  }, [])
+  }, [page]) //Добавление [page] позволяет изменять страницы с помощью функции changePage()
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
@@ -52,6 +53,10 @@ function App() {
   const removePost = (post) => {
     setPosts(posts.filter(p => p.id !== post.id))
 }
+
+  const changePage = (page) => {
+    setPage(page)
+  }
 
   // Метод localeCompare возвращает чилсо, указывающее, должна ли данная строка находиться до,
   // после или в том же самом месте, что и строка, переданная через параметр, при сортировке этих строк
@@ -86,11 +91,11 @@ function App() {
         : <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про JavaScript" />
 
       }
-      <div className='page__wrapper'>
-        {pagesArray.map(p => 
-          <span className={page === p ? 'page page__current' : 'page'} onClick={() => setPage(p)}>{p}</span> // условие: если элемент итерации функции map = номеру текущей страницы, то добавляем к нему класс page__current если не равны, то page
-        )}
-        </div>
+      <Pagination 
+        page={page} 
+        changePage={changePage} 
+        totalPages={totalPages}
+      />
     </div>
   );
 };

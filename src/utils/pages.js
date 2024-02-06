@@ -7,7 +7,7 @@ export const getPageCount = (totalCount, limit) => {
 // функция которая принимает общее количество старниц и на основании этого количества запоняет массив
 export const getPagesArray = (totalPages) => {
     let result = [];
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = 0; i <= totalPages; i++) {
         result.push(i + 1)
     }
     return result
